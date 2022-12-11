@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Python+jieba分词工具</title>
+</head>
+<body>
+	<div class="main_box">
+		<div class="input_box">
+			<!-- 输入 -->
+			<textarea placeholder="输入大段中文:" class="" id="text1"></textarea>
+
+			<div class="btn_func_box">
+				<button class="btn_func" id="btn_show" type="button" onclick="printValue()">输出结果</button>
+				<button class="btn_func" id="btn_del" type="button" onclick="deleteAllButtons()">删除所有结果</button>
+			</div>
+
+			<div class="wordtype_combo_box">
+				<div class="add_newtype">
+					<div class="new_type_input">
+						<input type="text" id="new_type_input" >
+					</div>
+					<div class="add_newtype_btn">
+						<button name="add_newtype_btn" id="add_newtype_btn" onclick="add_newtype()">增加新类别</button>
+					</div>
+				</div>
+				
+				<div class="show_board">
+					<div>
+						<span ><strong>Type选中：</strong><a type="text" id="show_board"></a></span>
+					</div>
+					<div>
+						<span ><strong>动作：</strong><a type="text" id="show_board_2"></a></span>
+					</div>
+					
+				</div>
+
+				<div class="all_type_list">
+					<ul class="list" id="list">
+					</ul>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="output_box">
+			<div id="show_panel" class="show_panel">
+				<!-- <div class="show_board_2">
+					<span ><strong>动作：</strong><a type="text" id="show_board_2"></a></span>
+				</div> -->
+				<div class="btn_set" id="tags_btn">
+					<!-- <button>{}</button> -->
+				</div>
+			</div>
+			<div class="top">
+				<span title="Top" id="topArrow"></span>
+			</div>
+		</div>
+	</div>
+	
+	
+
+	
+
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.js"></script>
+<script>
+    var input_words = {}
+    Object.defineProperty(input_words, 'inputValue', {
+        configurable: true,
+        get: function() {
+            return document.getElementById('text1').value
+        },
+        set: function(value) {
+            document.getElementById('text1').value = value
+        }
+    })
+
+	function printValue(){
+    	// 生成jieba切分词后的按钮
+    	var inputValue=document.getElementById('text1').value
+    	$.ajax({
+        url: "test_post/nn",
+        type: "POST",
+        data:{"mydata":$('textarea[id="text1"]').val()},
+        dataType: "json",
+        success: function (inputValue) {
+        	var input_json=JSON.parse(inputValue.output);
+            for (var elem in input_json){
+            	console.log(elem);
+            	if (elem.toString()=="title"){
+            		// console.log(input_json[elem][0]);
+            		for (var ele in input_json[elem][0]){
+            			var show_panel=document.getElementById('show_panel');
+            			var show_div=document.createElement('div');
+            			show_div.className='show_div';
+            			show_panel.appendChild(show_div);
+            			console.log(ele);
+            			var show_title=document.createElement('div');
+            			show_title.innerHTML='<strong>Title:</strong>'+ele;
+            			show_title.className="btn_tag_text";
+            			show_div.appendChild(show_title);
+            			var seg_list=input_json[elem][0][ele]
+            			for (var word in seg_list){
+            				var show_btn=document.createElement('button');
+            				show_btn.innerHTML=seg_list[word];
+            				show_btn.className="btn_tag";
+            				show_div.appendChild(show_btn);
+            			}
+            		}
+            	}
+            	else if(elem.toString()=="meta"){
+            		for (var i in input_json[elem]){
+            			for (var ele in input_json[elem][i]){
+	            			var show_panel=document.getElementById('show_panel');
+	            			var show_div=document.createElement('div');
+	            			show_div.className='show_div';
+	            			show_panel.appendChild(show_div);
+	            			console.log(ele);
+	            			var show_meta=document.createElement('div');
+	            			show_meta.innerHTML='<strong>Meta:</strong>'+ele;
+	            			show_meta.className="btn_tag_text";
+	            			show_div.appendChild(show_meta);
+	            			var seg_list=input_json[elem][i][ele]
+	            			for (var word in seg_list){
+	            				var show_btn=document.createElement('button');
+	            				show_btn.innerHTML=seg_list[word];
+	            				show_btn.className="btn_tag";
+	            				show_div.appendChild(show_btn);
+	            			}
+	            		}
+            		}
+            	}
+            	else if(elem.toString()=="a_text"){
+            		for (var i in input_json[elem]){
+            			for (var ele in input_json[elem][i]){
+	            			var show_panel=document.getElementById('show_panel');
+	            			var show_div=document.createElement('div');
+	            			show_div.className='show_div';
+	            			show_panel.appendChild(show_div);
+	            			console.log(ele);
+	            			var show_a_text=document.createElement('div');
+	            			show_a_text.innerHTML='<strong>a_text:</strong>'+ele;
+	            			show_a_text.className="btn_tag_text";
+	            			show_div.appendChild(show_a_text);
+	            			var seg_list=input_json[elem][i][ele]
+	            			for (var word in seg_list){
+	            				var show_btn=document.createElement('button');
+	            				show_btn.innerHTML=seg_list[word];
+	            				show_btn.className="btn_tag";
+	            				show_div.appendChild(show_btn);
+	            			}
+	            		}
+            		}
+            	}
+            	else if(elem.toString()=="text"){
+            		for (var i in input_json[elem]){
+            			for (var ele in input_json[elem][i]){
+	            			var show_panel=document.getElementById('show_panel');
+	            			var show_div=document.createElement('div');
+	            			show_div.className='show_div';
+	            			show_panel.appendChild(show_div);
+	            			console.log(ele);
+	            			var show_text=document.createElement('div');
+	            			show_text.innerHTML='<strong>text:</strong>'+ele;
+	            			show_text.className="btn_tag_text";
+	            			show_div.appendChild(show_text);
+	            			var seg_list=input_json[elem][i][ele]
+	            			for (var word in seg_list){
+	            				var show_btn=document.createElement('button');
+	            				show_btn.innerHTML=seg_list[word];
+	            				show_btn.className="btn_tag";
+	            				show_div.appendChild(show_btn);
+	            			}
+	            		}
+            		}
+            	}
+            	else{
+            	}
+            }
+            removeBtn();
+        }
+    	})
+    }
+    
+    function deleteAllButtons(){
+    	var btns=document.querySelectorAll("button.btn_tag");
+    	for (let i=0;i<btns.length;i++ ){
+    		btns[i].remove()
+    	}
+    	var divs=document.querySelectorAll("div.btn_tag_text");
+    	for (let i=0;i<divs.length;i++ ){
+    		divs[i].remove()
+    	}
+    }
+
+    document.onkeydown=function(e){    //对整个页面监听  
+		var keyNum=window.event ? e.keyCode :e.which;       //获取被按下的键值  
+		//判断如果用户按下了回车键（keycody=13）  
+		if(keyNum==13){  
+		    // console.log('您按下了回车');  
+			document.getElementById('btn_show').onclick();
+		}
+	};
+
+	function removeBtn(){
+		// 点击按钮时删除按钮，并录入数据库
+		var btns=document.querySelectorAll("button.btn_tag");
+		for (let i=0;i<btns.length;i++ ){
+	    	btns[i].onclick=function(){
+	    		if ($('#show_board').text()){
+	    			console.log('type已选中:'+$('#show_board').text());
+	    			$.ajax({
+	    				url:"/test_post/cc",
+	    				type: "POST",
+	    				data:{"type":$('#show_board').text(),"new_word":btns[i].innerHTML},
+		        		dataType: "json",
+		        		success:function(ret){
+		        			console.log(ret.ret_info);
+		        		},
+		        		fail:function(){
+		        		}
+	    			});
+	    			$('#show_board_2').text(this.innerHTML+' 入库了~~');
+		    		this.remove();
+	    		}
+	    		else{
+	    			console.log('type未选中！');
+	    		}
+	    	};
+	}}
+
+	function add_newtype(){
+		var newtype_input_value=$('#new_type_input').val();
+		var ul_type_list=document.getElementById('list');
+		if (newtype_input_value){
+			// console.log('点击了'+$('#add_newtype_btn').text())
+			// console.log($('#new_type_input'))
+			console.log('输入框的值 '+newtype_input_value);
+			$.ajax({
+				url: "test_post/dd",
+        		type: "POST",
+        		data:{"newtype":newtype_input_value},
+        		dataType: "json",
+        		success:function(ret){
+        			console.log(ret.ret_info);
+        			if (ret.ret_info){
+        				var li_item=document.createElement('li');
+		        		li_item.innerHTML=newtype_input_value;
+		        		li_item.className="list-item";
+		        		ul_type_list.appendChild(li_item);
+        			}
+        			else{
+        			}
+
+        			var li_items=document.querySelectorAll("li.list-item");
+		        	/*点击列表中的type时保持选中样式*/
+		        	for (var i = li_items.length - 1; i >= 0; i--) {
+		        		$(li_items[i]).click(function(){
+		        			console.log('Type已选中 '+this.innerText);
+		        			$(this).siblings('li').removeClass('selected');// 删除其他兄弟元素的样式
+				        	$(this).addClass('selected');// 添加当前元素的样式
+				        	$('#show_board').text(this.innerText);
+        		});
+        	}
+        		}
+			})
+		}
+		else{
+			console.log('nothing at [input] block');
+		}
+	}
+
+</script>
+<script>
+	$("#topArrow").click(function(){
+		$(document).scrollTop(0);
+	})
+</script>
+
+<script type="text/javascript">
+	// 网页Type列表初始化加载
+	console.log('------Type初始化加载--finish----');
+	var ul_type_list=document.getElementById('list');
+	$.ajax({
+		url: "test_post/bb",
+        type: "GET",
+        success:function(ret){
+        	var stopwords_list=JSON.parse(ret).output;
+        	// console.log(stopwords_list);
+        	for (var i = stopwords_list.length - 1; i >= 0; i--) {
+        		// console.log(stopwords_list[i]);
+        		var li_item=document.createElement('li');
+        		li_item.innerHTML=stopwords_list[i];
+        		li_item.className="list-item";
+        		ul_type_list.appendChild(li_item);
+        	}
+
+        	var li_items=document.querySelectorAll("li.list-item");
+        	/*点击列表中的type时保持选中样式*/
+        	for (var i = li_items.length - 1; i >= 0; i--) {
+        		$(li_items[i]).click(function(){
+        			console.log('Type已选中 '+this.innerText);
+        			$(this).siblings('li').removeClass('selected');// 删除其他兄弟元素的样式
+		        	$(this).addClass('selected');// 添加当前元素的样式
+		        	$('#show_board').text(this.innerText);
+        		});
+        	}
+        }
+	});
+</script>
+</body>
+
+<style type="text/css">
+	.main_box{
+		width: 850px;
+		height: 500px;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-round;
+	}
+
+	.input_box{
+		width: 400px;
+		height: 200px;
+		margin-left: 10px;
+		margin-right: 10px;
+	}
+
+	.output_box{
+		width: 400px;
+		height: 650px;
+		margin-left: 10px;
+		margin-right: 10px;
+	}
+
+	.output_box .show_panel{
+		width: 100%;
+		height: 100%;
+		overflow: auto;
+	}
+
+	.input_box textarea{
+		width: 100%;
+		height: 100%;
+	}
+
+	.output_box textarea{
+		width: 100%;
+		height: 100%;
+	}
+
+	.btn_func_box{/*功能按钮栏*/
+		margin-top: 10px;
+		margin-left: 10px;
+	}
+
+	.btn_func{
+		background-color: #4CAF50; /* Green */
+	    border: none;
+	    color: white;
+	    padding: 6px 10px;
+	    text-align: center;
+	    text-decoration: none;
+	    display: inline-block;
+	    font-size: 15px;
+	    border-radius: 5px;
+	}
+
+	.btn_func:hover{
+		opacity: 0.5;
+	}
+
+	.btn_set{/*标签按钮栏*/
+		/*width: 800px;
+		height: 150px;*/
+		display: flex;
+		margin-top: 10px;
+		margin-left: 10px;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-round;
+		margin:10px;
+	}
+
+	.btn_tag{
+		margin:3px;
+		background-color: #008CBA; /* Blue */
+	    border: none;
+	    color: white;
+	    padding: 3px 6px;
+	    text-align: center;
+	    text-decoration: none;
+	    display: inline-block;
+	    font-size: 16px;
+	    border-radius: 5px;
+	}
+
+	.btn_tag:hover{
+		opacity: 0.5;
+	}
+
+	.show_div{
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.top{
+		width: 50px;
+		height: 60px;
+		background-color: rgba(0,0,255,0.5);
+		border-radius: 10px;
+		position: fixed;
+		right: 40px;
+		bottom: 16%;
+	}
+	.top #topArrow{
+		width: 30px;
+		height: 30px;
+		border-top: 2px solid #fff;
+/*		//利用border和rotate绘制向上的箭头*/
+		border-left: 2px solid #fff;
+		display: inline-block;
+		transform: translate(9px,25px) rotate(45deg);
+		cursor: pointer;
+		z-index: 1000;
+/*		//避免被其他div遮盖*/
+	}
+	.top #topArrow:hover{
+		border-width: 4px;
+	}
+
+	.wordtype_combo_box{
+		width: 400px;
+		display: flex;
+		flex-direction: column;
+		flex-wrap: wrap;
+	}
+
+	.add_newtype{
+		display: flex;
+		flex-direction: row;
+		margin-left: 10px;
+		margin-top: 10px;
+	}
+
+	.show_board{
+/*		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;*/
+		width: 100%;
+		margin-left: 10px;
+		margin-top: 5px;
+	}
+
+	.all_type_list{
+		border: 1px solid #000;
+		border-radius: 2px;
+		margin-left: 10px;
+		margin-top: 5px;
+	}
+
+	.list{
+		display: block;
+		font-size: 12px;
+	}
+
+	.list-item{
+		display: list-item;
+	}
+	ul{
+		list-style-type: none;
+	}
+
+	li{
+		margin-left: -40px;
+		cursor: pointer;
+	}
+
+	li:hover{
+		border-radius: 3px;
+		background-color: orange;
+	}
+
+	.selected{font-weight:bold; background: orange; color:#fff;border-radius: 3px}
+</style>
+
+</html>
