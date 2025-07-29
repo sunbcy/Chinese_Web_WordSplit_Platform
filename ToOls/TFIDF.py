@@ -2,6 +2,7 @@ from collections import Counter
 from math import log10
 from re import split
 from jieba.posseg import dt
+
 FLAGS = set('a an b f i j l n nr nrfg nrt ns nt nz s t v vi vn z eng'.split())
 
 """
@@ -27,12 +28,14 @@ vn  名动词 审查 相互毗连 销蚀 对联 劳工 漫游 …
 z   状态词 歪曲 飘飘 慢慢儿 急地 沉迷在 晕呼呼 …
 """
 
+
 def cut(text):
     for sentence in split('[^a-zA-Z0-9\u4e00-\u9fa5]+', text.strip()):
         for w in dt.cut(sentence):
-            print(w.word,w.flag)
+            print(w.word, w.flag)
             if len(w.word) > 1 and w.flag in FLAGS:
                 yield w.word
+
 
 class TFIDF:
     def __init__(self):
@@ -43,7 +46,7 @@ class TFIDF:
         texts = [set(cut(text)) for text in texts]
         lent = len(texts)
         words = set(w for t in texts for w in t)
-        self.idf = {w: log10(lent/(sum((w in t)for t in texts)+1)) for w in words}
+        self.idf = {w: log10(lent / (sum((w in t) for t in texts) + 1)) for w in words}
         self.idf_max = log10(lent)
         return self
 
@@ -56,6 +59,6 @@ class TFIDF:
             counter[w] += self.get_idf(w)
         return [i[0] for i in counter.most_common(top_n)]
 
-tfidf = TFIDF().fit(['奶茶', '巧克力奶茶', '巧克力酸奶', '巧克力', '巧克力']*2)
-print(tfidf.extract('酸奶巧克力奶茶'))
 
+tfidf = TFIDF().fit(['奶茶', '巧克力奶茶', '巧克力酸奶', '巧克力', '巧克力'] * 2)
+print(tfidf.extract('酸奶巧克力奶茶'))

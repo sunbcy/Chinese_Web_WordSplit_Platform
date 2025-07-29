@@ -86,34 +86,38 @@
 from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 import time
-elem_dict={}
-temp=[]
-stop_elems=['br','hr','form','option','input','script','style','object','applet']
+elem_dict = {}
+temp = []
+stop_elems = ['br', 'hr', 'form', 'option', 'input', 'script', 'style', 'object', 'applet']
+
 
 class MyHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         # print("Encountered a start tag:", tag)
         if tag not in stop_elems:
-            if tag not in temp:#
+            if tag not in temp:
                 temp.append(tag)
             else:
                 if tag not in elem_dict.keys():
-                    elem_dict[tag]=2
+                    elem_dict[tag] = 2
                 else:
-                    elem_dict[tag]+=1
+                    elem_dict[tag] += 1
         else:
             pass
 
-html_cnt=open('../TEMP/tophub.today.html','r',encoding='utf-8').read()
-def HTML_Parser(html_cnt):#count elems in html,get frequency
-    output=''
-    blacklist=['[document]','noscript','header','html','meta','head','input','script','style']
+
+html_cnt = open('../TEMP/tophub.today.html', 'r', encoding='utf-8').read()
+
+
+def HTML_Parser(html_cnt):  # count elems in html,get frequency
+    output = ''
+    blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script', 'style']
     parser = MyHTMLParser()
     parser.feed(html_cnt)
-    soup=BeautifulSoup(html_cnt,'lxml')
-    head_tag=soup.head
-    title_tag=head_tag.contents
-    title=soup.title.string if soup.title else None
+    soup = BeautifulSoup(html_cnt, 'lxml')
+    head_tag = soup.head
+    title_tag = head_tag.contents
+    title = soup.title.string if soup.title else None
     print(title)
     # print(title_tag)
     # text=soup.find_all(text=True)
@@ -129,14 +133,14 @@ def HTML_Parser(html_cnt):#count elems in html,get frequency
 # print(end_time-start_time,'s')
 
 
-class Stack():
+class Stack:
     def __init__(self):
-        self.items=[]
+        self.items = []
 
     def get(self):
-        return(self.items)
+        return self.items
 
-    def push(self,item):
+    def push(self, item):
         self.items.append(item)
 
     def pop(self):
@@ -153,22 +157,24 @@ class Stack():
 
 
 # print('网页元素统计',html_elem_count)
-html1_cnt=open('../TEMP/test.html','r',encoding='utf-8').read()
-class htmlparser():
-    def __init__(self,input_html):
-        self.input_html=input_html
+html1_cnt = open('../TEMP/test.html', 'r', encoding='utf-8').read()
+
+
+class htmlparser:
+    def __init__(self, input_html):
+        self.input_html = input_html
 
     def check_tag(self):
         # print(self.input_html)
-        stack1=Stack()
-        stack2=Stack()
-        temp=[]
+        stack1 = Stack()
+        stack2 = Stack()
+        temp = []
         for i in self.input_html:
-            while i=='>':
+            while i == '>':
                 while stack1.size():
-                    temp_a=stack1.pop()
+                    temp_a = stack1.pop()
                     print(temp_a)
-                    if temp_a not in ['/','<']:
+                    if temp_a not in ['/', '<']:
                         temp.append(temp_a)
                 break
             stack1.push(i)
@@ -183,7 +189,7 @@ class htmlparser():
         return stack2.get()
 
 
-a=htmlparser(html1_cnt)
+a = htmlparser(html1_cnt)
 print(a.check_tag())
 
 # b=Stack()
