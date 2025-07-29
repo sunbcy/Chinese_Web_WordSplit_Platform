@@ -10,35 +10,35 @@ from wash_html import wash_html
 # ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
-def Local_STOPWORDS_Init():  # 本地停用词文件初始化
+def local_stop_words_init():  # 本地停用词文件初始化
     if 'Bcy_Stopwords' not in os.listdir(os.path.abspath('')):
         os.makedirs(os.path.abspath('Bcy_Stopwords'))
-    Bcy_Stopwords_Punctuations = open(os.path.abspath('Bcy_Stopwords/Bcy_Stopwords_Punctuations'), 'r',
+    bcy_stopwords_punctuations = open(os.path.abspath('Bcy_Stopwords/Bcy_Stopwords_Punctuations'), 'r',
                                       encoding='utf-8').read()
-    Bcy_Stopwords_Punctuations = [i for i in Bcy_Stopwords_Punctuations.split('\n') if i]
-    Bcy_Stopwords_Punctuations = list(set(Bcy_Stopwords_Punctuations))  # 去重
+    bcy_stopwords_punctuations = [i for i in bcy_stopwords_punctuations.split('\n') if i]
+    bcy_stopwords_punctuations = list(set(bcy_stopwords_punctuations))  # 去重
     with open(os.path.abspath('Bcy_Stopwords/Bcy_Stopwords_Punctuations'), 'w', encoding='utf-8') as f:
-        for i in Bcy_Stopwords_Punctuations:
+        for i in bcy_stopwords_punctuations:
             f.write(f"{i}\n")
 
 
-def Local_ClassifiedFile_Init():  # 本地大类词汇分类文件初始化
+def local_classified_file_init():  # 本地大类词汇分类文件初始化
     if 'Bcy_ClassifiedFile' not in os.listdir(os.path.abspath('')):
         os.makedirs(os.path.join(os.path.abspath(''), 'Bcy_ClassifiedFile'))
     local_classified_list = os.listdir(os.path.join(os.path.abspath(''), 'Bcy_ClassifiedFile'))
 
-    Init_WordType = ('App&网站名', '公司名', '国家', '重要历史事件', '车_品牌', 'Others')  # 可以在代码自定义添加一些分类，项目初始化时候自动生成!!!
-    for i in Init_WordType:
+    init_word_type = ('App&网站名', '公司名', '国家', '重要历史事件', '车_品牌', 'Others')  # 可以在代码自定义添加一些分类，项目初始化时候自动生成!!!
+    for i in init_word_type:
         if i not in local_classified_list:
             a = open(os.path.abspath(f'Bcy_ClassifiedFile/{i}'), 'w', encoding='utf-8')  # 新建一个初始化分类词的文件
             a.close()
     # 分类词文件去重
     for w in local_classified_list:
-        Bcy_ClassifiedWords = open(os.path.abspath(f'Bcy_ClassifiedFile/{w}'), 'r', encoding='utf-8').read()
-        Bcy_ClassifiedWords = [i for i in Bcy_ClassifiedWords.split('\n') if i]
-        Bcy_ClassifiedWords = list(set(Bcy_ClassifiedWords))  # 去重
+        bcy_classified_words = open(os.path.abspath(f'Bcy_ClassifiedFile/{w}'), 'r', encoding='utf-8').read()
+        bcy_classified_words = [i for i in bcy_classified_words.split('\n') if i]
+        bcy_classified_words = list(set(bcy_classified_words))  # 去重
         with open(os.path.abspath(f'Bcy_ClassifiedFile/{w}'), 'w', encoding='utf-8') as f:
-            for i in Bcy_ClassifiedWords:
+            for i in bcy_classified_words:
                 # f.write(f"{i}\n")
                 if i[-2:] != ' n':
                     # print(i.split(' ')[0])
@@ -68,20 +68,20 @@ app = Flask(__name__)  # 实例化app对象
 
 # 配合网页停用词、大类词初始化加载
 @app.route('/test_post/bb', methods=['GET'])  # 路由
-def Web_STOPWORDS_Init():
-    Bcy_STOPWORDS_list = os.listdir(os.path.abspath('Bcy_Stopwords'))
-    Bcy_ClassifiedFile_list = os.listdir(os.path.abspath('Bcy_ClassifiedFile'))
-    data = {"output": Bcy_STOPWORDS_list + Bcy_ClassifiedFile_list}
+def web_stop_words_init():
+    bcy_stop_words_list = os.listdir(os.path.abspath('Bcy_Stopwords'))
+    bcy_classified_file_list = os.listdir(os.path.abspath('Bcy_ClassifiedFile'))
+    data = {"output": bcy_stop_words_list + bcy_classified_file_list}
     return json.dumps(data)
 
 
 # 添加新类词
 @app.route('/test_post/dd', methods=['POST'])
-def Get_NewType_Word():
-    NewType = request.form.get('newtype')
-    Bcy_ClassifiedFile = os.listdir(os.path.abspath('Bcy_ClassifiedFile'))
-    if NewType not in Bcy_ClassifiedFile:
-        a = open(os.path.join(os.path.abspath(''), 'Bcy_ClassifiedFile', NewType), 'w', encoding='utf-8')  # 新建一个该分类词的文件
+def get_newtype_word():
+    new_type = request.form.get('newtype')
+    bcy_classified_file = os.listdir(os.path.abspath('Bcy_ClassifiedFile'))
+    if new_type not in bcy_classified_file:
+        a = open(os.path.abspath(f'Bcy_ClassifiedFile/{new_type}'), 'w', encoding='utf-8')  # 新建一个该分类词的文件
         a.close()
         data = {"ret_info": True}
     else:
@@ -91,22 +91,22 @@ def Get_NewType_Word():
 
 @app.route('/test_post/cc', methods=['GET', 'POST'])  # 路由
 # 词库Type 新增按钮的值 New_word
-def New_Word_submit():
-    Type = request.form.get('type')
-    New_word = request.form.get('new_word')
-    if "Bcy_Stopwords" in Type:  # 如果web选中的类别是停用词
-        Bcy_Class_path = os.path.join(os.path.abspath(''), 'Bcy_Stopwords')
+def new_word_submit():
+    type = request.form.get('type')
+    new_word = request.form.get('new_word')
+    if "Bcy_Stopwords" in type:  # 如果web选中的类别是停用词
+        bcy_class_path = os.path.join(os.path.abspath(''), 'Bcy_Stopwords')
     else:  # 如果web选中的类别不是停用词
-        Bcy_Class_path = os.path.join(os.path.abspath(''), 'Bcy_ClassifiedFile')
+        bcy_class_path = os.path.join(os.path.abspath(''), 'Bcy_ClassifiedFile')
         # Bcy_Stopwords_content_list=open(os.path.join(Bcy_Class_path,Type),'a+',encoding='utf-8').read()
-    Bcy_Class_content_list = open(os.path.join(Bcy_Class_path, Type), 'a+', encoding='utf-8').read()
-    Bcy_Class_content_list = [i for i in Bcy_Class_content_list.split('\n') if i]
-    if New_word not in Bcy_Class_content_list:
-        with open(os.path.join(Bcy_Class_path, Type), 'a', encoding='utf-8') as f:
-            f.write(f"{New_word}\n")
+    bcy_class_content_list = open(os.path.join(bcy_class_path, type), 'a+', encoding='utf-8').read()
+    bcy_class_content_list = [i for i in bcy_class_content_list.split('\n') if i]
+    if new_word not in bcy_class_content_list:
+        with open(os.path.join(bcy_class_path, type), 'a', encoding='utf-8') as f:
+            f.write(f"{new_word}\n")
 
-    print(f"{New_word}添加到{Type}")
-    data = {"ret_info": f"{New_word}添加到{Type}"}
+    print(f"{new_word}添加到{type}")
+    data = {"ret_info": f"{new_word}添加到{type}"}
     return json.dumps(data)
 
 # @app.route('/remove_btn/aa',methods=['GET','POST'])#路由 接受按钮的值
@@ -146,8 +146,8 @@ def index():
  
 
 if __name__ == '__main__':
-    Local_STOPWORDS_Init()
-    Local_ClassifiedFile_Init()
+    local_stop_words_init()
+    local_classified_file_init()
     app.run(host='0.0.0.0',  # 任何ip都可以访问
             port=5010,  # 端口
             debug=True
